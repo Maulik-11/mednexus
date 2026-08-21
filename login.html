@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MedNexsus - RAG Based Intelligence System for Safe Healthcare</title>
+    <link rel="stylesheet" href="styles.css?v=5" />
+  </head>
+  <body>
+    <main class="role-landing">
+      <section class="landing-hero">
+        <div class="brand landing-brand">
+          <div class="brand-mark" aria-hidden="true">MN</div>
+          <div>
+            <strong>MedNexsus</strong>
+            <span>RAG Based Intelligence System for Safe Healthcare</span>
+          </div>
+        </div>
+
+        <div class="landing-copy">
+          <p class="eyebrow">Clinical intelligence with doctor oversight</p>
+          <h1>MedNexsus</h1>
+          <p class="landing-subtitle">
+            RAG Based Intelligence System for Safe Healthcare.
+          </p>
+          <p>
+            MedNexsus connects patient reports, medicines, safety rules, and
+            medical knowledge into one explainable healthcare workspace. Patients
+            get understandable report insights and timelines, while doctors get
+            structured clinical summaries before consultation.
+          </p>
+        </div>
+
+        <div class="landing-stats" aria-label="MedNexsus capabilities">
+          <div>
+            <strong>RAG</strong>
+            <span>Evidence-grounded medical answers</span>
+          </div>
+          <div>
+            <strong>Safety</strong>
+            <span>Allergy, emergency, and medicine alerts</span>
+          </div>
+          <div>
+            <strong>Twin</strong>
+            <span>Longitudinal patient health timeline</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="role-panel" aria-label="Choose login type">
+        <p class="eyebrow">Continue as</p>
+        <h2>Choose your workspace</h2>
+        <div class="role-card-grid">
+          <article class="role-card">
+            <span class="role-icon" aria-hidden="true">P</span>
+            <h3>Patient</h3>
+            <p>
+              Upload reports, understand abnormal values, check medicines, and
+              build your health journey timeline.
+            </p>
+            <button class="primary-btn full-width role-select-btn" data-role-choice="patient" type="button">
+              Continue as Patient
+            </button>
+          </article>
+
+          <article class="role-card doctor-role">
+            <span class="role-icon" aria-hidden="true">D</span>
+            <h3>Doctor</h3>
+            <p>
+              Review patient risk signals, abnormal reports, safety alerts, and
+              AI-prepared consultation briefs.
+            </p>
+            <button class="primary-btn full-width role-select-btn" data-role-choice="doctor" type="button">
+              Continue as Doctor
+            </button>
+          </article>
+        </div>
+
+        <div class="access-choice-panel" id="patientAccessPanel" hidden>
+          <h3>Patient Access</h3>
+          <p>Login to your patient dashboard or register a new patient profile.</p>
+          <div class="button-row">
+            <a class="primary-btn" href="patient-login.html">Login</a>
+            <a class="ghost-btn" href="patient-register.html">Register</a>
+          </div>
+        </div>
+
+        <div class="access-choice-panel" id="doctorAccessPanel" hidden>
+          <h3>Doctor Access</h3>
+          <p>Login to the Doctor Copilot dashboard or register as a clinician.</p>
+          <div class="button-row">
+            <a class="primary-btn" href="doctor-login.html">Login</a>
+            <a class="ghost-btn" href="doctor-register.html">Register</a>
+          </div>
+        </div>
+
+        <div class="about-panel">
+          <h3>What MedNexsus Does</h3>
+          <p>
+            The system is designed as a safe healthcare intelligence layer, not a
+            diagnosis replacement. It uses structured report analysis, a
+            guideline-style knowledge base, deterministic safety checks, and
+            role-based dashboards so patients and doctors see the right context.
+          </p>
+        </div>
+      </section>
+    </main>
+    <script src="landing.js?v=5"></script>
+  </body>
+</html>

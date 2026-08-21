@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doctor Login - MedNexsus</title>
+    <link rel="stylesheet" href="styles.css?v=4" />
+  </head>
+  <body data-role="Doctor">
+    <main class="auth-page">
+      <section class="auth-visual doctor-auth">
+        <div>
+          <div class="brand">
+            <div class="brand-mark" aria-hidden="true">MN</div>
+            <div>
+              <strong>MedNexsus</strong>
+              <span>Doctor Copilot</span>
+            </div>
+          </div>
+          <h1>See the clinical context before the visit.</h1>
+          <p>
+            Login to access the Doctor Copilot dashboard with patient summaries,
+            abnormal reports, safety alerts, and consultation-ready notes.
+          </p>
+        </div>
+        <div class="auth-feature-grid">
+          <div class="auth-feature">
+            <strong>Patient Queue</strong>
+            <span>Prioritize patients by risk and missing information.</span>
+          </div>
+          <div class="auth-feature">
+            <strong>Clinical Brief</strong>
+            <span>Review chief concerns, objective findings, and SOAP notes.</span>
+          </div>
+          <div class="auth-feature">
+            <strong>Safety Alerts</strong>
+            <span>Surface allergy, medicine, and emergency red flags.</span>
+          </div>
+          <div class="auth-feature">
+            <strong>Longitudinal Trends</strong>
+            <span>Inspect report changes across time.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="auth-card-wrap">
+        <form class="auth-card auth-form" id="loginForm">
+          <div>
+            <p class="eyebrow">Doctor access</p>
+            <h2>Doctor Login</h2>
+            <p>Demo doctor: <code>doctor@mednexsus.local</code> / <code>doctor123</code></p>
+          </div>
+          <label>
+            Email
+            <input class="text-input" id="loginEmail" type="email" value="doctor@mednexsus.local" required />
+          </label>
+          <label>
+            Password
+            <input class="text-input" id="loginPassword" type="password" value="doctor123" required />
+          </label>
+          <p class="auth-message" id="authMessage"></p>
+          <button class="primary-btn full-width" type="submit">Login as Doctor</button>
+          <button class="ghost-btn full-width" id="demoLoginBtn" type="button">Use Doctor Demo</button>
+          <div class="auth-switch">
+            New doctor? <a href="doctor-register.html">Create doctor account</a>
+            <br />
+            <a href="login.html">Back to MedNexsus</a>
+          </div>
+        </form>
+      </section>
+    </main>
+    <script src="auth.js?v=4"></script>
+  </body>
+</html>

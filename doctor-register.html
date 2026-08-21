@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doctor Register - MedNexsus</title>
+    <link rel="stylesheet" href="styles.css?v=4" />
+  </head>
+  <body data-role="Doctor">
+    <main class="auth-page">
+      <section class="auth-visual doctor-auth">
+        <div>
+          <div class="brand">
+            <div class="brand-mark" aria-hidden="true">MN</div>
+            <div>
+              <strong>MedNexsus</strong>
+              <span>Doctor Registration</span>
+            </div>
+          </div>
+          <h1>Create your doctor workspace.</h1>
+          <p>
+            Register as a clinician to access Doctor Copilot: patient queue,
+            safety alerts, consultation summaries, and clinical reasoning.
+          </p>
+        </div>
+      </section>
+
+      <section class="auth-card-wrap">
+        <form class="auth-card auth-form" id="registerForm">
+          <div>
+            <p class="eyebrow">Doctor account</p>
+            <h2>Register as Doctor</h2>
+          </div>
+          <label>Full name <input class="text-input" id="registerName" type="text" required /></label>
+          <label>Email <input class="text-input" id="registerEmail" type="email" required /></label>
+          <label>Password <input class="text-input" id="registerPassword" type="password" minlength="4" required /></label>
+          <label>Specialty <input class="text-input" id="registerSpecialty" type="text" placeholder="Cardiologist" /></label>
+          <label>Hospital / Clinic <input class="text-input" id="registerHospital" type="text" placeholder="City Care Hospital" /></label>
+          <p class="auth-message" id="authMessage"></p>
+          <button class="primary-btn full-width" type="submit">Create Doctor Account</button>
+          <div class="auth-switch">
+            Already registered? <a href="doctor-login.html">Doctor login</a>
+            <br />
+            <a href="login.html">Back to MedNexsus</a>
+          </div>
+        </form>
+      </section>
+    </main>
+    <script src="auth.js?v=4"></script>
+  </body>
+</html>

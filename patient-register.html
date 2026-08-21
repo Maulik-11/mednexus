@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Patient Register - MedNexsus</title>
+    <link rel="stylesheet" href="styles.css?v=4" />
+  </head>
+  <body data-role="Patient">
+    <main class="auth-page">
+      <section class="auth-visual">
+        <div>
+          <div class="brand">
+            <div class="brand-mark" aria-hidden="true">MN</div>
+            <div>
+              <strong>MedNexsus</strong>
+              <span>Patient Registration</span>
+            </div>
+          </div>
+          <h1>Create your patient profile.</h1>
+          <p>
+            Start with your medicines, allergies, and health history. Your saved
+            reports will power the dashboard and timeline.
+          </p>
+        </div>
+      </section>
+
+      <section class="auth-card-wrap">
+        <form class="auth-card auth-form" id="registerForm">
+          <div>
+            <p class="eyebrow">Patient account</p>
+            <h2>Register as Patient</h2>
+          </div>
+          <label>Full name <input class="text-input" id="registerName" type="text" required /></label>
+          <label>Email <input class="text-input" id="registerEmail" type="email" required /></label>
+          <label>Password <input class="text-input" id="registerPassword" type="password" minlength="4" required /></label>
+          <label>Age <input class="text-input" id="registerAge" type="number" min="1" max="120" value="35" required /></label>
+          <label>Conditions <input class="text-input" id="registerConditions" type="text" placeholder="Diabetes, Hypertension" /></label>
+          <label>Current medicines <input class="text-input" id="registerMedicines" type="text" placeholder="Metformin, Amlodipine" /></label>
+          <label>Allergies <input class="text-input" id="registerAllergies" type="text" placeholder="Penicillin" /></label>
+          <label class="checkbox-row">
+            <input id="registerUseSample" type="checkbox" />
+            Start with sample clinical reports
+          </label>
+          <p class="auth-message" id="authMessage"></p>
+          <button class="primary-btn full-width" type="submit">Create Patient Account</button>
+          <div class="auth-switch">
+            Already registered? <a href="patient-login.html">Patient login</a>
+            <br />
+            <a href="login.html">Back to MedNexsus</a>
+          </div>
+        </form>
+      </section>
+    </main>
+    <script src="auth.js?v=4"></script>
+  </body>
+</html>

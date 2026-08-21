@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doctor Copilot Dashboard - MedNexsus</title>
+    <link rel="stylesheet" href="styles.css?v=4" />
+  </head>
+  <body>
+    <div class="doctor-shell">
+      <aside class="sidebar doctor-sidebar" aria-label="Doctor Copilot modules">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">MN</div>
+          <div>
+            <strong>MedNexsus</strong>
+            <span>Doctor Copilot</span>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-link is-active" data-panel="overview" type="button">
+            <span aria-hidden="true">01</span>
+            Overview
+          </button>
+          <button class="nav-link" data-panel="patients" type="button">
+            <span aria-hidden="true">02</span>
+            Patient Queue
+          </button>
+          <button class="nav-link" data-panel="brief" type="button">
+            <span aria-hidden="true">03</span>
+            Consultation Brief
+          </button>
+          <button class="nav-link" data-panel="safety" type="button">
+            <span aria-hidden="true">04</span>
+            Safety Review
+          </button>
+        </nav>
+
+        <div class="profile-strip">
+          <span class="status-dot" aria-hidden="true"></span>
+          <div>
+            <strong id="doctorName">Doctor</strong>
+            <span id="doctorMeta">Clinical review active</span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Doctor-only workspace</p>
+            <h1>Doctor Copilot Dashboard</h1>
+          </div>
+          <div class="top-actions">
+            <span class="user-chip" id="doctorUserChip">Doctor</span>
+            <button class="ghost-btn" id="refreshPatientsBtn" type="button">Refresh Queue</button>
+            <button class="ghost-btn" id="doctorLogoutBtn" type="button">Logout</button>
+          </div>
+        </header>
+
+        <section class="doctor-panel is-active" id="overview">
+          <div class="dashboard-hero doctor-hero">
+            <div class="patient-summary">
+              <p class="eyebrow">MedNexsus Doctor Copilot</p>
+              <h2 id="selectedPatientName">Select a patient</h2>
+              <p id="selectedPatientStory">
+                Choose a patient from the queue to review abnormal values,
+                medicines, safety rules, and consultation readiness.
+              </p>
+              <div class="summary-tags" id="selectedPatientTags"></div>
+            </div>
+            <div class="score-panel">
+              <div class="score-ring" id="doctorScoreRing">
+                <span id="doctorRiskScore">--</span>
+                <small>Risk Score</small>
+              </div>
+              <div>
+                <strong id="doctorRiskLabel">Pending</strong>
+                <p id="doctorRiskNarrative">No patient selected.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-grid" id="doctorMetrics"></div>
+
+          <div class="split-layout">
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Patient queue</p>
+                  <h2>Priority Review</h2>
+                </div>
+              </div>
+              <div class="doctor-patient-list" id="doctorPatientList"></div>
+            </section>
+
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Explainable summary</p>
+                  <h2>Clinical Signals</h2>
+                </div>
+              </div>
+              <div id="doctorSignals" class="result-stack"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="doctor-panel" id="patients">
+          <section class="tool-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">All registered patients</p>
+                <h2>Patient Queue</h2>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Patient</th>
+                    <th>Conditions</th>
+                    <th>Reports</th>
+                    <th>Risk</th>
+                    <th>Latest Concern</th>
+                  </tr>
+                </thead>
+                <tbody id="doctorQueueTable"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section class="doctor-panel" id="brief">
+          <div class="split-layout">
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Consultation preparation</p>
+                  <h2>Doctor Inputs</h2>
+                </div>
+              </div>
+              <label class="field-label" for="doctorSpecialtySelect">Specialty lens</label>
+              <select id="doctorSpecialtySelect" class="select-input">
+                <option>Endocrinology</option>
+                <option>Cardiology</option>
+                <option>Nephrology</option>
+                <option>General Medicine</option>
+              </select>
+              <label class="field-label" for="doctorConcernText">Consultation focus</label>
+              <textarea id="doctorConcernText" rows="7">Review diabetes control, kidney markers, anemia risk, medicines, and missing tests.</textarea>
+              <button class="primary-btn full-width" id="generateDoctorBriefBtn" type="button">
+                Generate Consultation Brief
+              </button>
+            </section>
+
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Clinician-facing output</p>
+                  <h2>Prepared Brief</h2>
+                </div>
+              </div>
+              <div id="doctorBriefResult" class="result-stack"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="doctor-panel" id="safety">
+          <div class="split-layout">
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Safety engine</p>
+                  <h2>Doctor Safety Review</h2>
+                </div>
+              </div>
+              <label class="field-label" for="doctorSafetyText">Additional symptoms or notes</label>
+              <textarea id="doctorSafetyText" rows="8">Chest discomfort, shortness of breath, allergy history, medicine review, abnormal creatinine.</textarea>
+              <button class="primary-btn full-width" id="runDoctorSafetyBtn" type="button">Run Safety Review</button>
+            </section>
+
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Doctor-only alerts</p>
+                  <h2>Safety Result</h2>
+                </div>
+              </div>
+              <div id="doctorSafetyResult" class="result-stack"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="doctor.js?v=4"></script>
+  </body>
+</html>

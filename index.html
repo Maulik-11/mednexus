@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Patient Dashboard - MedNexsus</title>
+    <meta
+      name="description"
+      content="30 percent MVP implementation for an AI Hospital Copilot with report analysis, clinical safety, medical knowledge, medicine checks, doctor prep, and patient timeline."
+    />
+    <link rel="stylesheet" href="styles.css?v=4" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="AI Hospital Copilot modules">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">HC</div>
+          <div>
+            <strong>MedNexsus</strong>
+            <span>Patient Workspace</span>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <button class="nav-link is-active" data-view="dashboard" type="button">
+            <span aria-hidden="true">01</span>
+            Dashboard
+          </button>
+          <button class="nav-link" data-view="reports" type="button">
+            <span aria-hidden="true">02</span>
+            Report Analyzer
+          </button>
+          <button class="nav-link" data-view="knowledge" type="button">
+            <span aria-hidden="true">03</span>
+            Medical RAG
+          </button>
+          <button class="nav-link" data-view="medicines" type="button">
+            <span aria-hidden="true">04</span>
+            Medicine Intel
+          </button>
+          <button class="nav-link doctor-only" data-view="doctor" type="button">
+            <span aria-hidden="true">05</span>
+            Doctor Copilot
+          </button>
+          <button class="nav-link" data-view="timeline" type="button">
+            <span aria-hidden="true">06</span>
+            Health Timeline
+          </button>
+          <button class="nav-link" data-view="safety" type="button">
+            <span aria-hidden="true">07</span>
+            Safety Engine
+          </button>
+        </nav>
+
+        <div class="profile-strip">
+          <span class="status-dot" aria-hidden="true"></span>
+          <div>
+            <strong id="sidebarPatientName">Demo Patient</strong>
+            <span id="sidebarPatientMeta">FHIR-style profile ready</span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">30 percent implementation slice</p>
+            <h1 id="pageTitle">Clinical Intelligence Dashboard</h1>
+          </div>
+          <div class="top-actions">
+            <span class="user-chip" id="currentUserChip">Not signed in</span>
+            <button class="ghost-btn" id="loadSampleBtn" type="button">Load Sample</button>
+            <button class="primary-btn" id="openProfileBtn" type="button">Patient Profile</button>
+            <button class="ghost-btn" id="logoutBtn" type="button">Logout</button>
+          </div>
+        </header>
+
+        <section class="view is-active" id="dashboard" aria-labelledby="pageTitle">
+          <div class="dashboard-hero">
+            <div class="patient-summary">
+              <p class="eyebrow">Doctor-in-the-loop clinical intelligence</p>
+              <h2 id="heroPatientName">Mira Kapoor</h2>
+              <p id="heroPatientStory">
+                Type 2 diabetes and hypertension under follow-up. Latest data suggests
+                glucose control and kidney monitoring need attention.
+              </p>
+              <div class="summary-tags" id="heroTags"></div>
+            </div>
+            <div class="score-panel">
+              <div class="score-ring" id="scoreRing" aria-label="Health score">
+                <span id="healthScore">72</span>
+                <small>Health Score</small>
+              </div>
+              <div>
+                <strong id="riskLabel">Moderate Risk</strong>
+                <p id="riskNarrative">
+                  Follow-up recommended because HbA1c and creatinine are trending upward.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-grid" id="dashboardMetrics"></div>
+
+          <div class="split-layout">
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Visual twin snapshot</p>
+                  <h2>Body System Status</h2>
+                </div>
+              </div>
+              <div class="body-map-wrap">
+                <div class="body-map" aria-label="Clickable body system map">
+                  <button class="organ organ-heart" data-organ="Heart" type="button" title="Heart status">Heart</button>
+                  <button class="organ organ-lungs" data-organ="Lungs" type="button" title="Lung status">Lungs</button>
+                  <button class="organ organ-liver" data-organ="Liver" type="button" title="Liver status">Liver</button>
+                  <button class="organ organ-kidney" data-organ="Kidney" type="button" title="Kidney status">Kidney</button>
+                  <button class="organ organ-blood" data-organ="Blood" type="button" title="Blood status">Blood</button>
+                </div>
+                <div class="organ-detail" id="organDetail"></div>
+              </div>
+            </section>
+
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Explainable AI</p>
+                  <h2>Reasoning Graph</h2>
+                </div>
+              </div>
+              <div class="reasoning-graph" id="reasoningGraph"></div>
+            </section>
+          </div>
+
+          <div class="split-layout">
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Next actions</p>
+                  <h2>Copilot Queue</h2>
+                </div>
+              </div>
+              <div class="action-list" id="actionList"></div>
+            </section>
+
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Safety first</p>
+                  <h2>Active Alerts</h2>
+                </div>
+              </div>
+              <div class="alert-list" id="dashboardAlerts"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="reports" aria-labelledby="pageTitle">
+          <div class="split-layout reports-layout">
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Medical Report Analyzer</p>
+                  <h2>Upload or Paste a Lab Report</h2>
+                </div>
+                <button class="ghost-btn compact" id="sampleReportBtn" type="button">Use Sample</button>
+              </div>
+              <label class="upload-box" for="reportFile">
+                <input id="reportFile" type="file" accept=".txt,.csv,.pdf,.png,.jpg,.jpeg" />
+                <span>Drop-in ready uploader</span>
+                <small>Text and CSV are parsed in-browser. PDF/image files are queued for OCR integration.</small>
+              </label>
+              <label class="field-label" for="reportText">Report text</label>
+              <textarea id="reportText" rows="12" spellcheck="false"></textarea>
+              <div class="button-row">
+                <button class="primary-btn" id="analyzeReportBtn" type="button">Analyze Report</button>
+                <button class="ghost-btn" id="saveReportBtn" type="button">Save to Timeline</button>
+              </div>
+            </section>
+
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Structured output</p>
+                  <h2>Analysis Result</h2>
+                </div>
+              </div>
+              <div id="reportResult" class="result-stack"></div>
+            </section>
+          </div>
+
+          <section class="tool-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Longitudinal comparison</p>
+                <h2>Report Trends</h2>
+              </div>
+              <select id="trendMetricSelect" class="select-input" aria-label="Trend metric"></select>
+            </div>
+            <div class="comparison-grid">
+              <div class="chart-box" id="trendChart"></div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Hemoglobin</th>
+                      <th>HbA1c</th>
+                      <th>Creatinine</th>
+                      <th>Glucose</th>
+                    </tr>
+                  </thead>
+                  <tbody id="comparisonTable"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" id="knowledge" aria-labelledby="pageTitle">
+          <section class="tool-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Evidence-grounded medical RAG</p>
+                <h2>Ask the Knowledge Base</h2>
+              </div>
+            </div>
+            <div class="query-row">
+              <input
+                id="knowledgeQuery"
+                class="text-input"
+                type="search"
+                value="Why is high creatinine important in diabetes?"
+                aria-label="Medical knowledge question"
+              />
+              <button class="primary-btn" id="askKnowledgeBtn" type="button">Ask</button>
+            </div>
+            <div id="knowledgeResult" class="rag-result"></div>
+          </section>
+
+          <div class="source-grid" id="sourceGrid"></div>
+        </section>
+
+        <section class="view" id="medicines" aria-labelledby="pageTitle">
+          <div class="split-layout">
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Medicine intelligence</p>
+                  <h2>Prescription Check</h2>
+                </div>
+                <button class="ghost-btn compact" id="samplePrescriptionBtn" type="button">Use Sample</button>
+              </div>
+              <label class="field-label" for="prescriptionText">Prescription or medicine list</label>
+              <textarea id="prescriptionText" rows="9"></textarea>
+              <label class="field-label" for="allergyInput">Known allergies</label>
+              <input id="allergyInput" class="text-input" type="text" />
+              <button class="primary-btn full-width" id="analyzeMedicineBtn" type="button">
+                Analyze Medicines
+              </button>
+            </section>
+
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Warnings and explanations</p>
+                  <h2>Medicine Result</h2>
+                </div>
+              </div>
+              <div id="medicineResult" class="result-stack"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view doctor-only" id="doctor" aria-labelledby="pageTitle">
+          <div class="split-layout">
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Doctor copilot</p>
+                  <h2>Consultation Readiness</h2>
+                </div>
+              </div>
+              <label class="field-label" for="specialtySelect">Specialist</label>
+              <select id="specialtySelect" class="select-input">
+                <option>Cardiologist</option>
+                <option>Endocrinologist</option>
+                <option>Nephrologist</option>
+                <option>General Physician</option>
+              </select>
+              <label class="field-label" for="chiefComplaint">Chief complaint</label>
+              <textarea id="chiefComplaint" rows="6">Fatigue for 3 weeks, increased thirst, and concern about recent blood test changes.</textarea>
+              <button class="primary-btn full-width" id="generateConsultBtn" type="button">
+                Generate Doctor Brief
+              </button>
+            </section>
+
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">For clinician review</p>
+                  <h2>Prepared Brief</h2>
+                </div>
+              </div>
+              <div id="consultationResult" class="result-stack"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="timeline" aria-labelledby="pageTitle">
+          <section class="tool-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Patient digital twin foundation</p>
+                <h2>Interactive Health Timeline</h2>
+              </div>
+              <select id="storyMetricSelect" class="select-input" aria-label="Timeline metric"></select>
+            </div>
+            <div class="timeline-layout">
+              <div class="timeline-track" id="timelineTrack"></div>
+              <div class="timeline-detail" id="timelineDetail"></div>
+            </div>
+          </section>
+
+          <section class="tool-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">AI patient story</p>
+                <h2>Longitudinal Narrative</h2>
+              </div>
+            </div>
+            <div id="patientStory" class="story-box"></div>
+          </section>
+        </section>
+
+        <section class="view" id="safety" aria-labelledby="pageTitle">
+          <div class="split-layout">
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Clinical safety engine</p>
+                  <h2>Rule-Based Checks</h2>
+                </div>
+              </div>
+              <label class="field-label" for="safetyText">Symptoms, medicines, or report notes</label>
+              <textarea id="safetyText" rows="9">Chest discomfort with shortness of breath and sweating. Current medicines: metformin, amlodipine. Allergy: penicillin.</textarea>
+              <button class="primary-btn full-width" id="runSafetyBtn" type="button">Run Safety Checks</button>
+            </section>
+
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Human-in-the-loop safeguards</p>
+                  <h2>Safety Result</h2>
+                </div>
+              </div>
+              <div id="safetyResult" class="result-stack"></div>
+            </section>
+          </div>
+
+          <section class="tool-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Audit policy</p>
+                <h2>What the MVP Enforces</h2>
+              </div>
+            </div>
+            <div class="policy-grid" id="policyGrid"></div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal" id="profileModal" aria-hidden="true">
+      <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Simulated authentication and profile</p>
+            <h2 id="profileTitle">Patient Profile</h2>
+          </div>
+          <button class="icon-btn" id="closeProfileBtn" type="button" aria-label="Close profile">X</button>
+        </div>
+        <div class="profile-form">
+          <label>
+            Access mode
+            <select id="profileAuthMode" class="select-input">
+              <option>Login</option>
+              <option>Register</option>
+            </select>
+          </label>
+          <label>
+            Role
+            <select id="profileRole" class="select-input">
+              <option>Patient</option>
+              <option>Doctor</option>
+            </select>
+          </label>
+          <label>
+            Email
+            <input id="profileEmail" class="text-input" type="email" />
+          </label>
+          <label>
+            Patient name
+            <input id="profileName" class="text-input" type="text" />
+          </label>
+          <label>
+            Age
+            <input id="profileAge" class="text-input" type="number" min="1" max="120" />
+          </label>
+          <label>
+            Conditions
+            <input id="profileConditions" class="text-input" type="text" />
+          </label>
+          <label>
+            Current medicines
+            <input id="profileMedicines" class="text-input" type="text" />
+          </label>
+          <label>
+            Allergies
+            <input id="profileAllergies" class="text-input" type="text" />
+          </label>
+        </div>
+        <div class="button-row align-right">
+          <button class="ghost-btn" id="resetProfileBtn" type="button">Reset</button>
+          <button class="primary-btn" id="saveProfileBtn" type="button">Save Profile</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js?v=4"></script>
+  </body>
+</html>

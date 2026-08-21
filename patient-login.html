@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Patient Login - MedNexsus</title>
+    <link rel="stylesheet" href="styles.css?v=4" />
+  </head>
+  <body data-role="Patient">
+    <main class="auth-page">
+      <section class="auth-visual">
+        <div>
+          <div class="brand">
+            <div class="brand-mark" aria-hidden="true">MN</div>
+            <div>
+              <strong>MedNexsus</strong>
+              <span>Patient Workspace</span>
+            </div>
+          </div>
+          <h1>Understand your health journey.</h1>
+          <p>
+            Login to analyze reports, check medicines, ask evidence-grounded
+            medical questions, and build your personal health timeline.
+          </p>
+        </div>
+        <div class="auth-feature-grid">
+          <div class="auth-feature">
+            <strong>Report Analyzer</strong>
+            <span>Find high, low, and missing clinical markers.</span>
+          </div>
+          <div class="auth-feature">
+            <strong>Medicine Safety</strong>
+            <span>Check common warnings, allergies, and conflicts.</span>
+          </div>
+          <div class="auth-feature">
+            <strong>Medical RAG</strong>
+            <span>Ask patient-friendly questions with source links.</span>
+          </div>
+          <div class="auth-feature">
+            <strong>Timeline</strong>
+            <span>Turn reports into a longitudinal health story.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="auth-card-wrap">
+        <form class="auth-card auth-form" id="loginForm">
+          <div>
+            <p class="eyebrow">Patient access</p>
+            <h2>Patient Login</h2>
+            <p>Demo patient: <code>demo@hospitalcopilot.local</code> / <code>demo123</code></p>
+          </div>
+          <label>
+            Email
+            <input class="text-input" id="loginEmail" type="email" value="demo@hospitalcopilot.local" required />
+          </label>
+          <label>
+            Password
+            <input class="text-input" id="loginPassword" type="password" value="demo123" required />
+          </label>
+          <p class="auth-message" id="authMessage"></p>
+          <button class="primary-btn full-width" type="submit">Login as Patient</button>
+          <button class="ghost-btn full-width" id="demoLoginBtn" type="button">Use Patient Demo</button>
+          <div class="auth-switch">
+            New patient? <a href="patient-register.html">Create patient account</a>
+            <br />
+            <a href="login.html">Back to MedNexsus</a>
+          </div>
+        </form>
+      </section>
+    </main>
+    <script src="auth.js?v=4"></script>
+  </body>
+</html>

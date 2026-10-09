@@ -70,6 +70,19 @@ function getSelectedPatient() {
   return patients.find((patient) => patient.id === selectedPatientId) || patients[0] || null;
 }
 
+function getAppointments() {
+  return getPatients()
+    .flatMap((user) =>
+      (user.appointments || []).map((appointment) => ({
+        ...appointment,
+        patientId: user.id,
+        patientName: user.patient.name,
+        risk: calculateRisk(user),
+      })),
+    )
+    .sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+}
+
 function getLatestReport(user) {
   const reports = user?.reports || [];
   if (!reports.length) return null;
@@ -114,6 +127,17 @@ function formatValue(key, value) {
 function formatDate(value) {
   if (!value) return "No date";
   return new Intl.DateTimeFormat("en", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(value));
+}
+
+function formatDateTime(value) {
+  if (!value) return "No date";
+  return new Intl.DateTimeFormat("en", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
 }
 
 function tag(text, className = "") {
@@ -199,12 +223,13 @@ function renderDashboard() {
   renderDoctorHeader();
   renderPatientList();
   renderQueueTable();
+  renderAppointmentQueue();
 
   $("#doctorMetrics").innerHTML = [
     metric("Patients in Queue", patients.length, "Registered patient accounts"),
     metric("High Priority", patients.filter((patient) => calculateRisk(patient) < 62).length, "Needs early review"),
     metric("Reports Reviewed", patients.reduce((sum, patient) => sum + (patient.reports || []).length, 0), "Saved patient reports"),
-    metric("Active Safety Alerts", selected ? runSafety(selected).length : 0, "For selected patient"),
+    metric("Appointments", getAppointments().length, "Scheduled consultations"),
   ].join("");
 
   if (!selected) {
@@ -284,6 +309,26 @@ function renderQueueTable() {
         })
         .join("")
     : `<tr><td colspan="5">No patient accounts are registered yet.</td></tr>`;
+}
+
+function renderAppointmentQueue() {
+  const appointments = getAppointments();
+  $("#doctorAppointmentTable").innerHTML = appointments.length
+    ? appointments
+        .map(
+          (appointment) => `
+            <tr>
+              <td>${escapeHtml(formatDateTime(appointment.dateTime))}</td>
+              <td>${escapeHtml(appointment.patientName)}</td>
+              <td>${escapeHtml(appointment.specialist)}</td>
+              <td>${escapeHtml(appointment.type)}</td>
+              <td>${escapeHtml(appointment.reason || "No reason provided")}</td>
+              <td>${appointment.risk}</td>
+            </tr>
+          `,
+        )
+        .join("")
+    : `<tr><td colspan="6">No appointments booked yet.</td></tr>`;
 }
 
 function renderClinicalSignals(user) {
@@ -386,6 +431,63 @@ function renderDoctorSafety() {
     .join("");
 }
 
+function generateTranscriptSoap() {
+  const user = getSelectedPatient();
+  const transcript = $("#consultationTranscript").value.trim();
+  if (!user) {
+    $("#transcriptSoapResult").innerHTML = `<div class="empty-state">Select a patient before generating SOAP notes.</div>`;
+    return;
+  }
+
+  const lower = transcript.toLowerCase();
+  const alerts = runSafety(user, transcript).filter((alert) => alert.level !== "low");
+  const latest = getLatestReport(user);
+  const abnormal = getAbnormalLabs(latest);
+  const followUps = [];
+
+  if (lower.includes("kidney") || lower.includes("creatinine") || abnormal.some((item) => item.key === "creatinine" || item.key === "egfr")) {
+    followUps.push("Repeat kidney function and urine ACR.");
+  }
+  if (lower.includes("hba1c") || lower.includes("diabetes") || abnormal.some((item) => item.key === "hba1c" || item.key === "glucose")) {
+    followUps.push("Review glucose log, adherence, diet, and HbA1c target.");
+  }
+  if (lower.includes("ferritin") || lower.includes("iron") || abnormal.some((item) => item.key === "hemoglobin" || item.key === "ferritin")) {
+    followUps.push("Evaluate anemia with ferritin, B12, folate, and blood loss history.");
+  }
+  if (!followUps.length) followUps.push("Confirm clinical plan and follow-up interval.");
+
+  $("#transcriptSoapResult").innerHTML = `
+    <article class="result-card">
+      <h3>Transcript Summary</h3>
+      <p>${escapeHtml(transcript || "No transcript provided.")}</p>
+    </article>
+    <article class="result-card medium">
+      <h3>SOAP Note</h3>
+      <p><strong>S:</strong> ${escapeHtml(extractSubjective(transcript, user))}</p>
+      <p><strong>O:</strong> ${escapeHtml(abnormal.length ? abnormal.map((item) => `${item.lab.label} ${formatValue(item.key, item.value)}`).join("; ") : "No abnormal structured markers in latest saved report.")}</p>
+      <p><strong>A:</strong> Educational draft only. Doctor must confirm assessment and plan.</p>
+      <p><strong>P:</strong> ${escapeHtml(followUps.join(" "))}</p>
+    </article>
+    <article class="result-card ${alerts.length ? "high" : "low"}">
+      <h3>Safety Flags</h3>
+      ${
+        alerts.length
+          ? alerts.map((alert) => `<p><strong>${escapeHtml(alert.title)}:</strong> ${escapeHtml(alert.message)}</p>`).join("")
+          : "<p>No urgent safety alert was triggered by the transcript.</p>"
+      }
+    </article>
+  `;
+}
+
+function extractSubjective(transcript, user) {
+  if (!transcript) return `${user.patient.name} attended consultation. Symptoms not documented in transcript.`;
+  const sentences = transcript
+    .split(/[.!?]/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+  return sentences.slice(0, 2).join(". ") || transcript;
+}
+
 function setPanel(panelId) {
   $all(".doctor-panel").forEach((panel) => panel.classList.toggle("is-active", panel.id === panelId));
   $all(".doctor-sidebar .nav-link").forEach((link) => link.classList.toggle("is-active", link.dataset.panel === panelId));
@@ -410,6 +512,7 @@ function attachEvents() {
 
   $("#generateDoctorBriefBtn").addEventListener("click", renderDoctorBrief);
   $("#runDoctorSafetyBtn").addEventListener("click", renderDoctorSafety);
+  $("#generateSoapFromTranscriptBtn").addEventListener("click", generateTranscriptSoap);
   $("#doctorLogoutBtn").addEventListener("click", () => {
     clearSession();
     window.location.href = "login.html";
@@ -420,4 +523,5 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!initialize()) return;
   attachEvents();
   renderDashboard();
+  generateTranscriptSoap();
 });

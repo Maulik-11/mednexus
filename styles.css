@@ -877,6 +877,39 @@ tr:last-child td {
   min-height: 160px;
 }
 
+.appointment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.appointment-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fbfdff;
+  padding: 16px;
+}
+
+.appointment-card small,
+.appointment-card strong {
+  display: block;
+}
+
+.appointment-card small {
+  color: var(--teal);
+  font-weight: 850;
+}
+
+.appointment-card strong {
+  margin-top: 8px;
+}
+
+.appointment-card p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 .modal {
   position: fixed;
   inset: 0;
@@ -1341,7 +1374,8 @@ tr:last-child td {
   .split-layout,
   .reports-layout,
   .comparison-grid,
-  .timeline-layout {
+  .timeline-layout,
+  .appointment-grid {
     grid-template-columns: 1fr;
   }
 

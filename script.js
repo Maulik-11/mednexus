@@ -248,6 +248,17 @@ const SAMPLE_REPORTS = [
   },
 ];
 
+const SAMPLE_APPOINTMENTS = [
+  {
+    id: "appt-2026-10-12",
+    dateTime: "2026-10-12T10:30",
+    specialist: "Endocrinologist",
+    type: "Video Call",
+    status: "Scheduled",
+    reason: "Review diabetes control, kidney markers, low ferritin, and current medicines.",
+  },
+];
+
 const MEDICINES = {
   metformin: {
     name: "Metformin",
@@ -435,6 +446,7 @@ let appData = null;
 let state = {
   patient: structuredCloneSafe(DEFAULT_PATIENT),
   reports: structuredCloneSafe(SAMPLE_REPORTS),
+  appointments: structuredCloneSafe(SAMPLE_APPOINTMENTS),
   latestAnalysis: null,
   selectedOrgan: "Kidney",
 };
@@ -457,6 +469,7 @@ function createDemoUser() {
     createdAt: new Date().toISOString(),
     patient: structuredCloneSafe(DEFAULT_PATIENT),
     reports: structuredCloneSafe(SAMPLE_REPORTS),
+    appointments: structuredCloneSafe(SAMPLE_APPOINTMENTS),
   };
 }
 
@@ -561,6 +574,7 @@ function persistCurrentState() {
   if (!user) return;
   user.patient = structuredCloneSafe(state.patient);
   user.reports = structuredCloneSafe(state.reports);
+  user.appointments = structuredCloneSafe(state.appointments || []);
   user.updatedAt = new Date().toISOString();
   saveStoredData();
 }
@@ -580,6 +594,7 @@ function initializeFromStorage() {
   state = {
     patient: structuredCloneSafe(currentUser.patient || DEFAULT_PATIENT),
     reports: structuredCloneSafe(currentUser.reports || []),
+    appointments: structuredCloneSafe(currentUser.appointments || []),
     latestAnalysis: null,
     selectedOrgan: "Kidney",
   };
@@ -850,6 +865,7 @@ function renderApp() {
   renderTrendControls();
   renderComparison();
   renderKnowledgeSources();
+  renderConsultations();
   renderTimeline();
   renderPolicyGrid();
   renderProfileForm();
@@ -874,6 +890,9 @@ function hydrateDynamicInputs() {
     latest.note && latest.id !== "empty-report"
       ? latest.note
       : "Describe the chief complaint or consultation concern here.";
+  if ($("#appointmentDateTime")) {
+    $("#appointmentDateTime").value = getDefaultAppointmentDateTime();
+  }
 }
 
 function reportToText(report) {
@@ -885,6 +904,32 @@ function reportToText(report) {
 Date: ${report.date}
 ${labLines}
 Notes: ${report.note || ""}`.trim();
+}
+
+function getDefaultAppointmentDateTime() {
+  const date = new Date();
+  date.setDate(date.getDate() + 3);
+  date.setHours(10, 30, 0, 0);
+  const offset = date.getTimezoneOffset();
+  const local = new Date(date.getTime() - offset * 60000);
+  return local.toISOString().slice(0, 16);
+}
+
+function formatDateTime(value) {
+  if (!value) return "Not scheduled";
+  return new Intl.DateTimeFormat("en", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+function getNextAppointment() {
+  const appointments = [...(state.appointments || [])].sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+  const now = new Date();
+  return appointments.find((appointment) => new Date(appointment.dateTime) >= now) || appointments[0] || null;
 }
 
 function renderPatientHeader() {
@@ -925,7 +970,7 @@ function renderDashboard() {
   $("#heroPatientStory").textContent = buildPatientStoryText();
 
   $("#dashboardMetrics").innerHTML = [
-    metric("Upcoming Appointment", state.patient.upcomingAppointment, "Prepared doctor brief available"),
+    metric("Upcoming Appointment", nextAppointmentLabel(), "Prepared consultation summary available"),
     metric("Recent Reports", `${state.reports.length}`, `Latest: ${formatDate(latest.date)}`),
     metric("Today's Medicines", `${state.patient.medicines.length}`, "Adherence check ready"),
     metric("Abnormal Markers", `${abnormal.length}`, abnormal.slice(0, 3).map((item) => item.lab.label).join(", ") || "No abnormal markers"),
@@ -935,6 +980,12 @@ function renderDashboard() {
   renderReasoningGraph();
   renderActionList(abnormal);
   renderAlerts("#dashboardAlerts", alerts);
+}
+
+function nextAppointmentLabel() {
+  const appointment = getNextAppointment();
+  if (!appointment) return "No appointment booked";
+  return `${appointment.specialist} - ${formatDateTime(appointment.dateTime)}`;
 }
 
 function buildRiskNarrative(abnormal) {
@@ -1556,8 +1607,84 @@ function renderSoapNote(complaint, abnormal, missing) {
   `;
 }
 
+function renderConsultations() {
+  const appointments = [...(state.appointments || [])].sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+  $("#appointmentList").innerHTML = appointments.length
+    ? appointments.map(renderAppointmentCard).join("")
+    : `<div class="empty-state">No appointments booked yet. Book a consultation to share readiness details with the doctor dashboard.</div>`;
+  renderConsultationReadiness();
+}
+
+function renderAppointmentCard(appointment) {
+  return `
+    <article class="appointment-card">
+      <small>${escapeHtml(appointment.status || "Scheduled")}</small>
+      <strong>${escapeHtml(appointment.specialist)} - ${escapeHtml(appointment.type)}</strong>
+      <p>${escapeHtml(formatDateTime(appointment.dateTime))}</p>
+      <p>${escapeHtml(appointment.reason || "No reason provided.")}</p>
+    </article>
+  `;
+}
+
+function bookAppointment() {
+  const appointment = {
+    id: `appt-${Date.now()}`,
+    specialist: $("#appointmentSpecialist").value,
+    type: $("#appointmentType").value,
+    dateTime: $("#appointmentDateTime").value || getDefaultAppointmentDateTime(),
+    reason: $("#appointmentReason").value.trim() || "Consultation follow-up",
+    status: "Scheduled",
+  };
+  state.appointments = [...(state.appointments || []), appointment];
+  state.patient.upcomingAppointment = `${appointment.specialist} - ${formatDateTime(appointment.dateTime)}`;
+  persistCurrentState();
+  renderApp();
+  $("#consultationReadiness").insertAdjacentHTML(
+    "afterbegin",
+    `<article class="result-card low"><h3>Appointment Booked</h3><p>The consultation is now saved and visible in the Doctor Copilot appointment queue.</p></article>`,
+  );
+}
+
+function renderConsultationReadiness() {
+  const latest = getLatestReport();
+  const abnormal = getAbnormalLabs(latest);
+  const missing = getMissingInformation(latest.values);
+  const appointment = getNextAppointment();
+  const doctorQuestions = buildDoctorQuestions(latest.values, missing).slice(0, 4);
+
+  $("#consultationReadiness").innerHTML = `
+    <article class="result-card">
+      <h3>Consultation Snapshot</h3>
+      <p><strong>Patient:</strong> ${escapeHtml(state.patient.name)}, ${escapeHtml(state.patient.age)} years. Conditions: ${escapeHtml(state.patient.conditions.join(", ") || "None recorded")}.</p>
+      <p><strong>Next appointment:</strong> ${escapeHtml(appointment ? `${appointment.specialist}, ${formatDateTime(appointment.dateTime)}` : "Not booked yet")}.</p>
+      <p><strong>Medicines:</strong> ${escapeHtml(state.patient.medicines.join(", ") || "None recorded")}.</p>
+      <p><strong>Allergies:</strong> ${escapeHtml(state.patient.allergies.join(", ") || "None recorded")}.</p>
+    </article>
+    <article class="result-card ${abnormal.length ? "medium" : "low"}">
+      <h3>Doctor Should Review</h3>
+      ${
+        abnormal.length
+          ? `<ul>${abnormal.slice(0, 5).map((item) => `<li>${escapeHtml(item.lab.label)}: ${escapeHtml(formatValue(item.key, item.value))} (${escapeHtml(item.classification.label)})</li>`).join("")}</ul>`
+          : "<p>No abnormal structured markers detected by the MVP rules.</p>"
+      }
+    </article>
+    <article class="result-card low">
+      <h3>Questions Prepared</h3>
+      <ul>${doctorQuestions.map((question) => `<li>${escapeHtml(question)}</li>`).join("")}</ul>
+    </article>
+  `;
+}
+
 function renderTimeline() {
   const reports = [...state.reports].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const appointments = [...(state.appointments || [])].map((appointment) => ({
+    id: appointment.id,
+    date: appointment.dateTime,
+    title: `${appointment.specialist} consultation`,
+    type: "Appointment",
+    note: `${appointment.type}: ${appointment.reason}`,
+    appointment,
+  }));
   const events = [
     {
       id: "history-1",
@@ -1574,13 +1701,7 @@ function renderTimeline() {
       note: report.note,
       values: report.values,
     })),
-    {
-      id: "appointment-1",
-      date: "2026-08-22",
-      title: "Upcoming endocrinology review",
-      type: "Appointment",
-      note: "Doctor brief should highlight rising HbA1c, creatinine/eGFR trend, low ferritin, and medicine review.",
-    },
+    ...appointments,
   ].sort((a, b) => new Date(a.date) - new Date(b.date));
 
   $("#timelineTrack").innerHTML = events
@@ -1714,12 +1835,14 @@ function loadSample() {
   state = {
     patient: structuredCloneSafe(DEFAULT_PATIENT),
     reports: structuredCloneSafe(SAMPLE_REPORTS),
+    appointments: structuredCloneSafe(SAMPLE_APPOINTMENTS),
     latestAnalysis: null,
     selectedOrgan: "Kidney",
   };
   $("#reportText").value = SAMPLE_REPORT_TEXT;
   $("#prescriptionText").value = SAMPLE_PRESCRIPTION;
   $("#chiefComplaint").value = "Fatigue for 3 weeks, increased thirst, and concern about recent blood test changes.";
+  $("#appointmentDateTime").value = getDefaultAppointmentDateTime();
   renderApp();
   analyzeReportFromInput();
   askKnowledgeBase();
@@ -1740,6 +1863,7 @@ function setActiveView(viewId) {
     reports: "Medical Report Analyzer",
     knowledge: "Evidence-Grounded Medical RAG",
     medicines: "Medicine Intelligence",
+    consultations: "Consultation Readiness",
     doctor: "Doctor Copilot Dashboard",
     timeline: "Patient Health Timeline",
     safety: "Clinical Safety Engine",
@@ -1791,6 +1915,8 @@ function attachEvents() {
     analyzeMedicines();
   });
   $("#analyzeMedicineBtn").addEventListener("click", analyzeMedicines);
+  $("#bookAppointmentBtn").addEventListener("click", bookAppointment);
+  $("#generateReadinessBtn").addEventListener("click", renderConsultationReadiness);
   $("#generateConsultBtn").addEventListener("click", generateConsultationBrief);
   $("#runSafetyBtn").addEventListener("click", runSafetyFromInput);
   $("#loadSampleBtn").addEventListener("click", loadSample);
@@ -1803,6 +1929,7 @@ function attachEvents() {
     target.classList.add("is-active");
     const eventId = target.dataset.eventId;
     const reportEvent = state.reports.find((report) => report.id === eventId);
+    const appointmentEvent = (state.appointments || []).find((appointment) => appointment.id === eventId);
     if (reportEvent) {
       renderTimelineDetail({
         id: reportEvent.id,
@@ -1811,6 +1938,15 @@ function attachEvents() {
         type: "Report",
         note: reportEvent.note,
         values: reportEvent.values,
+      });
+    } else if (appointmentEvent) {
+      renderTimelineDetail({
+        id: appointmentEvent.id,
+        date: appointmentEvent.dateTime,
+        title: `${appointmentEvent.specialist} consultation`,
+        type: "Appointment",
+        note: `${appointmentEvent.type}: ${appointmentEvent.reason}`,
+        appointment: appointmentEvent,
       });
     } else if (eventId === "history-1") {
       renderTimelineDetail({
@@ -1821,10 +1957,10 @@ function attachEvents() {
       });
     } else {
       renderTimelineDetail({
-        date: "2026-08-22",
-        title: "Upcoming endocrinology review",
+        date: getNextAppointment()?.dateTime || new Date().toISOString(),
+        title: "Upcoming consultation",
         type: "Appointment",
-        note: "Doctor brief should highlight rising HbA1c, creatinine/eGFR trend, low ferritin, and medicine review.",
+        note: "Consultation readiness details are available in the consultation module.",
       });
     }
   });

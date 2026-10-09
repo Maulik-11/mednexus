@@ -8,7 +8,7 @@
       name="description"
       content="30 percent MVP implementation for an AI Hospital Copilot with report analysis, clinical safety, medical knowledge, medicine checks, doctor prep, and patient timeline."
     />
-    <link rel="stylesheet" href="styles.css?v=4" />
+    <link rel="stylesheet" href="styles.css?v=5" />
   </head>
   <body>
     <div class="app-shell">
@@ -38,16 +38,20 @@
             <span aria-hidden="true">04</span>
             Medicine Intel
           </button>
-          <button class="nav-link doctor-only" data-view="doctor" type="button">
+          <button class="nav-link" data-view="consultations" type="button">
             <span aria-hidden="true">05</span>
+            Consultations
+          </button>
+          <button class="nav-link doctor-only" data-view="doctor" type="button">
+            <span aria-hidden="true">06</span>
             Doctor Copilot
           </button>
           <button class="nav-link" data-view="timeline" type="button">
-            <span aria-hidden="true">06</span>
+            <span aria-hidden="true">07</span>
             Health Timeline
           </button>
           <button class="nav-link" data-view="safety" type="button">
-            <span aria-hidden="true">07</span>
+            <span aria-hidden="true">08</span>
             Safety Engine
           </button>
         </nav>
@@ -273,6 +277,60 @@
           </div>
         </section>
 
+        <section class="view" id="consultations" aria-labelledby="pageTitle">
+          <div class="split-layout">
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Doctor consultation</p>
+                  <h2>Book Appointment</h2>
+                </div>
+              </div>
+              <label class="field-label" for="appointmentSpecialist">Specialist</label>
+              <select id="appointmentSpecialist" class="select-input">
+                <option>Endocrinologist</option>
+                <option>Cardiologist</option>
+                <option>Nephrologist</option>
+                <option>General Physician</option>
+                <option>Dermatologist</option>
+                <option>Neurologist</option>
+              </select>
+              <label class="field-label" for="appointmentType">Consultation type</label>
+              <select id="appointmentType" class="select-input">
+                <option>Video Call</option>
+                <option>Voice Call</option>
+                <option>In-person Visit</option>
+              </select>
+              <label class="field-label" for="appointmentDateTime">Date and time</label>
+              <input id="appointmentDateTime" class="text-input" type="datetime-local" />
+              <label class="field-label" for="appointmentReason">Reason for visit</label>
+              <textarea id="appointmentReason" rows="6">Review abnormal report values, medicines, and missing follow-up tests.</textarea>
+              <button class="primary-btn full-width" id="bookAppointmentBtn" type="button">Book Appointment</button>
+            </section>
+
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Consultation readiness</p>
+                  <h2>AI Prepared Summary</h2>
+                </div>
+                <button class="ghost-btn compact" id="generateReadinessBtn" type="button">Generate</button>
+              </div>
+              <div id="consultationReadiness" class="result-stack"></div>
+            </section>
+          </div>
+
+          <section class="tool-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Scheduled care</p>
+                <h2>Appointment Timeline</h2>
+              </div>
+            </div>
+            <div class="appointment-grid" id="appointmentList"></div>
+          </section>
+        </section>
+
         <section class="view doctor-only" id="doctor" aria-labelledby="pageTitle">
           <div class="split-layout">
             <section class="tool-panel">
@@ -428,6 +486,6 @@
       </div>
     </div>
 
-    <script src="script.js?v=4"></script>
+    <script src="script.js?v=5"></script>
   </body>
 </html>

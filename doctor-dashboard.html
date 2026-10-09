@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Doctor Copilot Dashboard - MedNexsus</title>
-    <link rel="stylesheet" href="styles.css?v=4" />
+    <link rel="stylesheet" href="styles.css?v=5" />
   </head>
   <body>
     <div class="doctor-shell">
@@ -33,6 +33,14 @@
           <button class="nav-link" data-panel="safety" type="button">
             <span aria-hidden="true">04</span>
             Safety Review
+          </button>
+          <button class="nav-link" data-panel="appointments" type="button">
+            <span aria-hidden="true">05</span>
+            Appointments
+          </button>
+          <button class="nav-link" data-panel="notes" type="button">
+            <span aria-hidden="true">06</span>
+            SOAP Notes
           </button>
         </nav>
 
@@ -191,9 +199,63 @@
             </section>
           </div>
         </section>
+
+        <section class="doctor-panel" id="appointments">
+          <section class="tool-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Scheduled consultations</p>
+                <h2>Appointment Queue</h2>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Patient</th>
+                    <th>Specialist</th>
+                    <th>Type</th>
+                    <th>Reason</th>
+                    <th>Risk</th>
+                  </tr>
+                </thead>
+                <tbody id="doctorAppointmentTable"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section class="doctor-panel" id="notes">
+          <div class="split-layout">
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Voice consultation intelligence</p>
+                  <h2>Transcript to SOAP</h2>
+                </div>
+              </div>
+              <label class="field-label" for="consultationTranscript">Consultation transcript</label>
+              <textarea id="consultationTranscript" rows="11">Patient reports fatigue, increased thirst, and missed evening walks. Doctor reviewed HbA1c, creatinine, ferritin, current medicines, and advised repeat kidney test, urine ACR, and iron workup.</textarea>
+              <button class="primary-btn full-width" id="generateSoapFromTranscriptBtn" type="button">
+                Generate SOAP Note
+              </button>
+            </section>
+
+            <section class="tool-panel">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">Structured clinical note</p>
+                  <h2>Generated SOAP</h2>
+                </div>
+              </div>
+              <div id="transcriptSoapResult" class="result-stack"></div>
+            </section>
+          </div>
+        </section>
       </main>
     </div>
 
-    <script src="doctor.js?v=4"></script>
+    <script src="doctor.js?v=5"></script>
   </body>
 </html>

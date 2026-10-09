@@ -10,7 +10,9 @@ This workspace now contains a runnable local MVP for the project plan. It focuse
 - Longitudinal report comparison with trends across saved reports.
 - Evidence-grounded medical knowledge base with source links and insufficient-evidence fallback.
 - Medicine intelligence with purpose, common warnings, interaction checks, and allergy conflict checks.
+- Patient consultation booking with appointment timeline and readiness summary.
 - Separate Doctor Copilot dashboard with patient queue, abnormal values, missing information, draft SOAP note, and safety review.
+- Doctor appointment queue and transcript-to-SOAP note generator.
 - Patient health timeline that acts as the first version of the digital twin.
 - Clinical safety engine with deterministic red-flag, allergy, medicine, and lab-critical rules.
 
@@ -42,8 +44,9 @@ For a local web preview, you can also serve the folder with any static server.
 6. Save the report to the timeline and show the trend comparison.
 7. Ask the Medical RAG module about creatinine, diabetes, anemia, chest pain, or medicine safety.
 8. Run Medicine Intelligence on the sample prescription and show allergy and kidney-monitoring warnings.
-9. Logout, choose Doctor, then select Login and use the doctor demo account.
-10. Show the Doctor Copilot dashboard with patient queue, clinical signals, consultation brief, and safety review.
+9. Open Consultations, book an appointment, and show the readiness summary.
+10. Logout, choose Doctor, then select Login and use the doctor demo account.
+11. Show the Doctor Copilot dashboard with patient queue, appointment queue, clinical signals, consultation brief, transcript-to-SOAP note, and safety review.
 
 ## Current MVP Limitations
 
@@ -55,6 +58,7 @@ The next implementation phase should add:
 - OCR for PDF/image reports.
 - Real vector search over approved medical documents.
 - Authentication and role-based patient/doctor views.
+- Real voice-to-text capture for live consultation notes.
 - Audit logs and test coverage for clinical safety rules.
 - Optional OpenAI or Azure OpenAI integration for controlled summarization.
 

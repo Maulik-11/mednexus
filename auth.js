@@ -73,6 +73,17 @@ const SAMPLE_REPORTS = [
   },
 ];
 
+const SAMPLE_APPOINTMENTS = [
+  {
+    id: "appt-2026-10-12",
+    dateTime: "2026-10-12T10:30",
+    specialist: "Endocrinologist",
+    type: "Video Call",
+    status: "Scheduled",
+    reason: "Review diabetes control, kidney markers, low ferritin, and current medicines.",
+  },
+];
+
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
@@ -96,6 +107,7 @@ function createDemoUser() {
     createdAt: new Date().toISOString(),
     patient: clone(DEFAULT_PATIENT),
     reports: clone(SAMPLE_REPORTS),
+    appointments: clone(SAMPLE_APPOINTMENTS),
   };
 }
 
@@ -236,6 +248,7 @@ function register(event) {
     createdAt: new Date().toISOString(),
     patient,
     reports: useSample ? clone(SAMPLE_REPORTS) : [],
+    appointments: useSample ? clone(SAMPLE_APPOINTMENTS) : [],
   };
 
   data.users.push(user);
